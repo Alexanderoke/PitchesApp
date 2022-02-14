@@ -7,13 +7,13 @@ pitches = [
         'author': 'Alexander oke',
         'title': 'pitch 1',
         'content': 'First post content',
-        'date_posted': 'Febuary 10, 2022'
+        'date_posted': 'Febuary 10, 2022',
     },
     {
         'author': 'Alex William',
         'title': 'pitch 2',
         'content': 'Second post content',
-        'date_posted': 'Febuary 10, 2022'
+        'date_posted': 'Febuary 10, 2022',
     }
 ]
 
@@ -21,7 +21,7 @@ pitches = [
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html',pitches=pitches)
+    return render_template('home.html', pitches=pitches)
 
 
 @app.route("/about")
