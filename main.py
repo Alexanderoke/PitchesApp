@@ -1,5 +1,8 @@
 from flask import Flask, render_template,url_for
+from forms import RegistrationForm
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = '3c24c3b14050a4fd9f96396d'
 
 
 pitches = [
