@@ -2,6 +2,8 @@ from flask import render_template, url_for, flash, redirect
 from App.__init__ import app, db, bcrypt
 from App.forms import RegistrationForm, LoginForm
 from App.models import User, Pitch
+from flask_login import login_user, current_user, logout_user, login_required
+
 
 
 pitches = [
