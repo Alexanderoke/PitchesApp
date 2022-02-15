@@ -1,8 +1,11 @@
 from flask import Flask, render_template,url_for, flash, redirect
+from flask_sqlalchemy import SQLAlchemy
 from forms import RegistrationForm, LoginForm
-app = Flask(__name__)
 
+app = Flask(__name__)
 app.config['SECRET_KEY'] = '3c24c3b14050a4fd9f96396d'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db=SQLAlchemy(app)
 
 
 pitches = [
@@ -45,7 +48,7 @@ def register():
 def Login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
+        if form.email.data == 'admin@pitch.com' and form.password.data == 'password':
             flash('You have been logged in!', 'success')
             return redirect(url_for('home'))
         else:
