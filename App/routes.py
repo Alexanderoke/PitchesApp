@@ -1,9 +1,9 @@
 import os
 import secrets
 from PIL import Image
-from flask import render_template, request, url_for, flash, redirect
+from flask import render_template, request, url_for, flash, redirect, abort
 from App.__init__ import app, db, bcrypt
-from App.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from App.forms import RegistrationForm, LoginForm, UpdateAccountForm, PitchForm
 from App.models import User, Pitch
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -103,4 +103,52 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html', title='Account',image_file=image_file, form=form)    
+    return render_template('account.html', title='Account',image_file=image_file, form=form) 
+
+@app.route("/pitch/new", methods=['GET', 'POST'])
+@login_required
+def new_pitch():
+    form = PitchForm()
+    if form.validate_on_submit():
+        pitch = Pitch(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(pitch)
+        db.session.commit()
+        flash('You Pitched!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_pitch.html', title='New Pitch', form=form, legend='New Pitch')
+
+@app.route("/pitch/<int:pitch_id>")
+def post(pitch_id):
+    pitch = Pitch.query.get_or_404(pitch_id)
+    return render_template('pitch.html', title=pitch.title, pitch=pitch)
+
+
+@app.route("/pitch/<int:pitch_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_pitch(pitch_id):
+    pitch = pitch.query.get_or_404(pitch_id)
+    if pitch.author != current_user:
+        abort(403)
+    form = PitchForm()
+    if form.validate_on_submit():
+        pitch.title = form.title.data
+        pitch.content = form.content.data
+        db.session.commit()
+        flash('Your pitch has been updated!', 'success')
+        return redirect(url_for('pitch', pitch_id=pitch.id))
+    elif request.method == 'GET':
+        form.title.data = pitch.title
+        form.content.data = pitch.content
+    return render_template('create_pitch.html', title='Update pitch',
+                           form=form, legend='Update pitch')
+
+@app.route("/pitch/<int:pitch_id>/delete", methods=['POST'])
+@login_required
+def delete_pitch(pitch_id):
+    pitch = pitch.query.get_or_404(pitch_id)
+    if pitch.author != current_user:
+        abort(403)
+    db.session.delete(pitch)
+    db.session.commit()
+    flash('Your pitch has been deleted!', 'success')
+    return redirect(url_for('home'))
